@@ -1,0 +1,76 @@
+---
+title: " Practical Machine Learning - Prediction Assignment Writeup"
+author: "Benjamin Eggart"
+date: "19th of July 2021"
+output: html_document
+---
+
+### 1. What it is about
+
+This is the peer assesement solution for the Practical Machine Learning course . It predicts how six participants performed their exercises. This is also the "classe" variable of the training data. The algorithm is used on the 20 test cases available in the test data and the predictions are submitted.  it in the training set, is applied to the 20 test cases available in the test data. 
+
+### 2. R Libraries that are used
+```{r results='hide', message=FALSE}
+library(knitr)
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(rattle)
+library(randomForest)
+library(corrplot)
+library(e1071)
+library(gbm)
+set.seed(123)
+```
+
+### 3. Getting, Loading and Cleaning the Data
+Get the data.
+```{r results='hide', message=FALSE}
+# Download the dataset
+Train <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+Test  <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+
+```
+
+Load the data and split it in training and test data.
+```{r results='hide', message=FALSE}
+# Read thedata
+training <- read.csv(url(Train))
+testing  <- read.csv(url(Test))
+
+# create training dataset with 70% of the data
+train_part  <- createDataPartition(training$classe, p=0.7, list=FALSE)
+TrainSet <- training[train_part, ]
+TestSet  <- training[-train_part, ]
+dim(TrainSet)
+```
+The training data set is made of 19622 observations on 160 columns. The first seven columns give information about the people who did the test. They also provide a timestamps but this is ignored.
+Remove NAs.
+```{r results='hide', message=FALSE}
+# Get the indexes of the columns having at least 90% of NA or blank values on the training data
+indColToRemove <- which(colSums(is.na(TrainSet) |TrainSet=="")>0.9*dim(TrainSet)[1]) 
+TrainSetClean <- TrainSet[,-indColToRemove]
+TrainSetClean <- TrainSetClean[,-c(1:7)]
+dim(TrainSetClean)
+```
+The same is performed on the test data.
+```{r results='hid', message=FALSE}
+# Get the indexes of the columns having at least 90% of NA or blank values on the test data
+indColToRemove <- which(colSums(is.na(TestSet) |TestSet=="")>0.9*dim(TestSet)[1]) 
+TestSetClean <- TestSet[,-indColToRemove]
+TestSetClean <- TestSetClean[,-1]
+dim(TestSetClean)
+```
+
+### 4. Where are the collerations?
+
+Before having a modeling procedure a correlation among variables is performed.
+
+```{r}
+corMatrix <- cor(TrainSetClean[, -53])
+corrplot(corMatrix, order = "FPC", method = "color", type = "lower", 
+         tl.cex = 0.8, tl.col = rgb(255, 255, 255))
+
+```
+
