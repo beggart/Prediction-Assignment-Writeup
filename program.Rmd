@@ -77,7 +77,7 @@ corrplot(corMatrix, order = "FPC", method = "color", type = "lower",
 
 Three methods will be applied to model regressions with the Train dataset. The best one (highest accuracy for the Test dataset) will be used for the project predictions. (1) Random Forests, (2) Decision Tree and (3) Generalized Boosted Model are investigated. A Confusion Matrix is plotted for each analysis to better visualize the accuracy of the models.
 
-## 5.1 Random Forest
+### 5.1 Random Forest
 ```{r results='hid', message=FALSE}
 set.seed(123)
 controlRF <- trainControl(method="cv", number=3, verboseIter=FALSE)
@@ -101,7 +101,7 @@ plot(confMatRandForest$table, col = confMatRandForest$byClass,
                   round(confMatRandForest$overall['Accuracy'], 4)))
 ```
 
-## 5.2 Decision Tree
+### 5.2 Decision Tree
 ```{r results='hid', message=FALSE}
 set.seed(123)
 modFitDecTree <- rpart(classe ~ ., data=TrainSetClean, method="class")
@@ -119,7 +119,7 @@ plot(confMatDecTree$table, col = confMatDecTree$byClass,
      main = paste("Decision Tree - Accuracy =",
                   round(confMatDecTree$overall['Accuracy'], 4)))
 ```
-## 5.2 Generalized Boosted Model
+### 5.2 Generalized Boosted Model
 ```{r results='hid', message=FALSE}
 set.seed(123)
 controlGBM <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
